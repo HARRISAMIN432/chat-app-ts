@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken"
 import User from "../models/User.js"
 import generateUniqueConnectCode from "../utils/generateUniqueConnectCode.js";
 
-
 class AuthController {
     static async register(req, res) {
         try {

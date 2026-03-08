@@ -6,6 +6,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import http from 'http'
 import { connectDB } from './utils/db'
+import authRoutes from '../backend/routes/authRoutes'
 
 connectDB()
 
@@ -18,6 +19,8 @@ app.use(cors({
 }))
 
 app.use(cookieParser())
+
+app.use('/api/auth', authRoutes)
 
 try {
     const PORT = process.env.PORT || 4000
