@@ -162,7 +162,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSwitch }) => {
         <button
           type="submit"
           disabled={mutation.isPending}
-          className="w-full bg-sky-500 hover:bg-sky-600 disabled:opacity-70 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition duration-300 flex justify-center items-center"
+          className="mt-4 w-full bg-sky-500 hover:bg-sky-600 disabled:opacity-70 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition duration-300 flex justify-center items-center"
         >
           {mutation.isPending ? (
             <Loader2 className="animate-spin size-5" />
