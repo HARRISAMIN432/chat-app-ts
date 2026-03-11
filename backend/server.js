@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { connectDB } from "./utils/db.js";
 import authRoutes from "../backend/routes/authRoutes.js";
+import conversationRoutes from "../backend/routes/conversationRoutes.js";
 
 connectDB();
 
@@ -24,6 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 try {
   const PORT = process.env.PORT || 4000;
