@@ -7,92 +7,134 @@ class ConversationController {
     try {
       const userId = req.user._id;
       const { connectCode } = req.query;
+
       const friend = await User.findOne({ connectCode });
+
       if (!friend || friend._id.toString() === userId.toString()) {
-        return res.status(400).json({ message: "Invalid Connect ID" });
+        return res.status(400).json({ message: "Invalid connect ID" });
       }
+
       const existingFriendship = await Friendship.findOne({
         $or: [
           { requester: userId, recipient: friend._id },
           { requester: friend._id, recipient: userId },
         ],
       });
+
       if (existingFriendship) {
         return res.status(400).json({ message: "Friendship already exists" });
       }
-      res.status(200).json({
+
+      res.json({
         success: true,
         message: "Connect ID is valid",
       });
     } catch (error) {
-      console.log("Error checking connect code", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      console.error("Error checking connect code", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 
   static async getConversations(req, res) {
+    console.log("We have arrived");
     try {
-      const userId = req.user._id.toString();
+      console.log("Step 1: Starting getConversations");
+      const userId = req.user._id;
+      console.log("User ID:", userId);
 
+      console.log("Step 2: Fetching friendships");
       const friendships = await Friendship.find({
         $or: [{ requester: userId }, { recipient: userId }],
       })
         .populate([
-          { path: "requester", select: "username fullName connectCode" },
-          { path: "recipient", select: "username fullName connectCode" },
+          { path: "requester", select: "id fullName username connectCode" },
+          { path: "recipient", select: "id fullName username connectCode" },
         ])
         .lean();
 
-      if (!friendships.length) return res.json({ data: [] });
+      console.log("Friendships fetched:", friendships.length);
 
-      const friendIds = friendships.map((f) =>
-        f.requester._id.toString() === userId
-          ? f.recipient._id.toString()
-          : f.requester._id.toString(),
+      if (!friendships.length) {
+        console.log("No friendships found, returning empty array");
+        return res.json({ data: [] });
+      }
+
+      // extract friend ids
+      console.log("Step 3: Extracting friend IDs");
+      const friendIds = friendships.map((friend) =>
+        friend.requester._id.toString() === userId.toString()
+          ? friend.recipient._id.toString()
+          : friend.requester._id.toString(),
+      );
+      console.log("Friend IDs:", friendIds);
+
+      console.log("Step 4: Fetching conversations");
+      const conversations = await Conversation.find({
+        participants: {
+          $all: [userId],
+          $in: friendIds,
+          $size: 2,
+        },
+      });
+      console.log("Conversations fetched:", conversations.length);
+
+      console.log("Step 5: Mapping conversations");
+      const conversationsMap = new Map();
+      conversations.forEach((conversation) => {
+        const friendId = conversation.participants.find(
+          (p) => p.toString() !== userId.toString(),
+        );
+        console.log("Mapping conversation for friendId:", friendId);
+        conversationsMap.set(friendId.toString(), conversation);
+      });
+
+      console.log("Step 6: Preparing conversations data");
+      const conversationsData = await Promise.all(
+        friendships.map(async (friendship) => {
+          const isRequester =
+            friendship.requester._id.toString() === userId.toString();
+          const friend = isRequester
+            ? friendship.recipient
+            : friendship.requester;
+
+          const conversation = conversationsMap.get(friend._id.toString());
+          if (!conversation) {
+            console.log(
+              "No conversation found for friend:",
+              friend._id.toString(),
+            );
+          }
+
+          return {
+            conversationId: conversation?.id || null,
+            lastMessage: conversation?.lastMessagePreview || null,
+            unreadCounts: {
+              [friendship.requester._id.toString()]:
+                conversation?.unreadCounts?.get(
+                  friendship.requester._id.toString(),
+                ) || 0,
+              [friendship.recipient._id.toString()]:
+                conversation?.unreadCounts?.get(
+                  friendship.recipient._id.toString(),
+                ) || 0,
+            },
+            friend: {
+              id: friend._id.toString(),
+              username: friend.username,
+              fullName: friend.fullName,
+              connectCode: friend.connectCode,
+              online: false,
+            },
+          };
+        }),
       );
 
-      const conversations = await Conversation.find({
-        participants: { $all: [userId], $size: 2 },
-        participants: { $in: friendIds },
-      }).lean();
-
-      const conversationMap = new Map();
-      conversations.forEach((conv) => {
-        const friendId = conv.participants.find((p) => p.toString() !== userId);
-        if (friendId) conversationMap.set(friendId.toString(), conv);
-      });
-
-      const conversationsData = friendships.map((f) => {
-        const isRequester = f.requester._id.toString() === userId;
-        const friend = isRequester ? f.recipient : f.requester;
-
-        const conv = conversationMap.get(friend._id.toString()) || {};
-
-        return {
-          conversationId: conv._id?.toString() || null,
-          lastMessage: conv.lastMessagePreview || null,
-          unreadCounts: {
-            [f.requester._id.toString()]:
-              conv.unreadCounts?.[f.requester._id.toString()] || 0,
-            [f.recipient._id.toString()]:
-              conv.unreadCounts?.[f.recipient._id.toString()] || 0,
-          },
-          friend: {
-            id: friend._id.toString(),
-            username: friend.username,
-            fullName: friend.fullName,
-            connectCode: friend.connectCode,
-            online: false,
-          },
-        };
-      });
-
-      return res.status(200).json({ data: conversationsData });
+      console.log("Step 7: Sending response");
+      res.json({ data: conversationsData });
     } catch (error) {
       console.error("Error fetching conversations", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 }
-
 export default ConversationController;

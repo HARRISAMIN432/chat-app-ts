@@ -1,6 +1,6 @@
 import express from "express";
-import ConversationController from "../controllers/conversationController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import ConversationController from "../controllers/conversationController.js";
 
 const router = express.Router();
 
