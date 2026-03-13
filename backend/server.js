@@ -8,6 +8,9 @@ import http from "http";
 import { connectDB } from "./utils/db.js";
 import authRoutes from "../backend/routes/authRoutes.js";
 import conversationRoutes from "../backend/routes/conversationRoutes.js";
+import { Server } from "socket.io";
+import { initializeSocket } from "./socket.js";
+import { socketAuthMiddleware } from "./socket/socketAuthMiddleware.js";
 
 connectDB();
 
@@ -26,6 +29,20 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/conversations", conversationRoutes);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.CLIENT_ORIGIN,
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
+  pingInterval: 25000,
+  pingTimeout: 60000,
+});
+
+io.use(socketAuthMiddleware);
+
+await initializeSocket(io);
 
 try {
   const PORT = process.env.PORT || 4000;

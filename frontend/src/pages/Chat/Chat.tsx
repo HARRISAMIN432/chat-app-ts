@@ -1,6 +1,7 @@
 import type React from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import ChatWindow from "../../components/ChatWindow/ChatWindow";
+import { SocketProvider } from "../../contexts/SocketContext";
 
 const Chat: React.FC = () => {
   return (
