@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import cookie from "cookie";
-import User from "../models/User";
+import User from "../models/User.js";
 import { Socket } from "socket.io";
 
 export const socketAuthMiddleware = async (socket, next) => {

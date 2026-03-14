@@ -36,13 +36,9 @@ class ConversationController {
   }
 
   static async getConversations(req, res) {
-    console.log("We have arrived");
     try {
-      console.log("Step 1: Starting getConversations");
       const userId = req.user._id;
-      console.log("User ID:", userId);
 
-      console.log("Step 2: Fetching friendships");
       const friendships = await Friendship.find({
         $or: [{ requester: userId }, { recipient: userId }],
       })
@@ -52,23 +48,16 @@ class ConversationController {
         ])
         .lean();
 
-      console.log("Friendships fetched:", friendships.length);
-
       if (!friendships.length) {
-        console.log("No friendships found, returning empty array");
         return res.json({ data: [] });
       }
 
-      // extract friend ids
-      console.log("Step 3: Extracting friend IDs");
       const friendIds = friendships.map((friend) =>
         friend.requester._id.toString() === userId.toString()
           ? friend.recipient._id.toString()
           : friend.requester._id.toString(),
       );
-      console.log("Friend IDs:", friendIds);
 
-      console.log("Step 4: Fetching conversations");
       const conversations = await Conversation.find({
         participants: {
           $all: [userId],
@@ -76,9 +65,7 @@ class ConversationController {
           $size: 2,
         },
       });
-      console.log("Conversations fetched:", conversations.length);
 
-      console.log("Step 5: Mapping conversations");
       const conversationsMap = new Map();
       conversations.forEach((conversation) => {
         const friendId = conversation.participants.find(
@@ -88,7 +75,6 @@ class ConversationController {
         conversationsMap.set(friendId.toString(), conversation);
       });
 
-      console.log("Step 6: Preparing conversations data");
       const conversationsData = await Promise.all(
         friendships.map(async (friendship) => {
           const isRequester =
@@ -129,7 +115,6 @@ class ConversationController {
         }),
       );
 
-      console.log("Step 7: Sending response");
       res.json({ data: conversationsData });
     } catch (error) {
       console.error("Error fetching conversations", error);

@@ -5,7 +5,7 @@ import { SocketProvider } from "../../contexts/SocketContext";
 
 const Chat: React.FC = () => {
   return (
-    <>
+    <SocketProvider>
       <div className="min-h-screen bg-gray-100 flex flex-row">
         <div className="w-full sm:w-1/3 max-w-[456px] min-h-screen">
           <Sidebar />
@@ -14,7 +14,7 @@ const Chat: React.FC = () => {
           <ChatWindow />
         </div>
       </div>
-    </>
+    </SocketProvider>
   );
 };
 

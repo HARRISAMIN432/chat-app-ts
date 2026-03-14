@@ -1,13 +1,10 @@
 import { useConversationsContext } from "../../contexts/ConversationsContext";
 import ConversationItem from "./ConversationItem";
-import { useEffect } from "react";
 
 const Conversations: React.FC = () => {
   const { filteredConversations, isLoading, isError } =
     useConversationsContext();
-  useEffect(() => {
-    console.log("Conversations mounted");
-  }, []);
+
   if (isLoading) {
     return (
       <div className="flex-1 h-full items-center justify-center">
