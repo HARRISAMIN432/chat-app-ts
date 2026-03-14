@@ -36,7 +36,7 @@ conversationSchema.pre("save", function (next) {
     this.participants = this.participants.map((p) => p.toString()).sort();
   }
 
-  next();
+  // next();
 });
 
 export default mongoose.model("Conversation", conversationSchema);
