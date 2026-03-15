@@ -1,6 +1,7 @@
 import React from "react";
 import type { Conversation } from "../../contexts/ConversationsContext";
 import { useAuthStore } from "../../store/authStore";
+import { useConversationStore } from "../../store/conversationStore";
 
 const ConversationItem: React.FC<Conversation> = ({
   conversationId,
@@ -9,9 +10,13 @@ const ConversationItem: React.FC<Conversation> = ({
   lastMessage,
 }) => {
   const { user } = useAuthStore();
+  const { selectedConversation, setSelectedConversation } =
+    useConversationStore();
   const unreadMessages = () =>
     unreadCounts[user?.id ?? ""] > 0 || unreadCounts[friend.id] > 0;
   let displayTime;
+
+  const isSelected = selectedConversation?.conversationId === conversationId;
 
   if (lastMessage?.timestamp) {
     const createdAt = new Date(lastMessage.timestamp);
@@ -31,7 +36,17 @@ const ConversationItem: React.FC<Conversation> = ({
     displayTime = diffInDays >= 1 ? `${date} ${time}` : time;
   }
   return (
-    <div className="p-4 border-b border-gray-200 flex items-center space-x-3 cursor-pointer">
+    <div
+      className={`p-4 border-b border-gray-200 flex items-center space-x-3 cursor-pointer ${isSelected ? "bg-blue-100" : "bg-gray-50"}`}
+      onClick={() => {
+        setSelectedConversation({
+          conversationId,
+          friend,
+          lastMessage,
+          unreadCounts,
+        });
+      }}
+    >
       <div className="relative">
         <img
           src="avatar.png"
