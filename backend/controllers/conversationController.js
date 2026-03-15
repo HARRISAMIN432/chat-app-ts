@@ -8,7 +8,6 @@ class ConversationController {
     try {
       const userId = req.user._id;
       const { connectCode } = req.query;
-
       const friend = await User.findOne({ connectCode });
 
       if (!friend || friend._id.toString() === userId.toString()) {
@@ -25,7 +24,6 @@ class ConversationController {
       if (existingFriendship) {
         return res.status(400).json({ message: "Friendship already exists" });
       }
-
       res.json({
         success: true,
         message: "Connect ID is valid",

@@ -53,8 +53,8 @@ const ConversationItem: React.FC<Conversation> = ({
           <p
             className={
               unreadMessages()
-                ? "text-sm text-gray-500 truncate min-h-[20px]"
-                : "text-sm text-sky-500 truncate min-h-[20px]"
+                ? "text-sm text-gray-500 truncate min-h-5"
+                : "text-sm text-sky-500 truncate min-h-5"
             }
           >
             {lastMessage?.content ?? ""}

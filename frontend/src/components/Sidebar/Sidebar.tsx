@@ -1,6 +1,6 @@
 import type React from "react";
-import SidebarHeader from "./SidebarHeader";
-import SidebarSearchbar from "./SidebarSearchbar";
+import Header from "./Header";
+import SidebarSearchbar from "./SearchBar";
 import Conversations from "./Conversations";
 import UserProfile from "./UserProfile";
 import { ConversationsProvider } from "../../contexts/ConversationsContext";
@@ -9,7 +9,7 @@ const Sidebar: React.FC = () => {
   return (
     <ConversationsProvider>
       <div className="min-h-screen bg-white border-r border-gray-200 flex flex-col">
-        <SidebarHeader />
+        <Header />
         <SidebarSearchbar />
         <Conversations />
 

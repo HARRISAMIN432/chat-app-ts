@@ -1,15 +1,21 @@
 import RedisService from "./services/RedisService.js";
 import { leaveAllRooms } from "./socket/helpers.js";
-import { notifyConversationOnlineStatus } from "./socket/socketConversation.js";
+import {
+  conversationRequest,
+  notifyConversationOnlineStatus,
+} from "./socket/socketConversation.js";
 
 export const initializeSocket = async (io) => {
   io.on("connection", async (socket) => {
     try {
       const user = socket.user;
-      console.log("User connected", socket.id);
       socket.join(user._id.toString());
       await RedisService.addUserSession(user.id, socket.id);
       await notifyConversationOnlineStatus(io, socket, true);
+
+      socket.on("conversation:request", (data) =>
+        conversationRequest(io, socket, data),
+      );
 
       socket.on("disconnect", async () => {
         await notifyConversationOnlineStatus(io, socket, false);
