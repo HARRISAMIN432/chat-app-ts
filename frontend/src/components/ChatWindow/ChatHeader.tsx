@@ -10,7 +10,7 @@ const ChatHeader: React.FC = () => {
     <div className="p-4 border-b border-gray-200 flex items-center justify-between">
       <div className="flex items-center space-x-3">
         <img
-          src="https://avatar.iran.liara.run/public"
+          src="avatar.png"
           alt="User image"
           className="size-10 rounded-full object-cover"
         />
