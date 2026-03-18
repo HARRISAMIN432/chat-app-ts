@@ -4,6 +4,7 @@ import {
   conversationMarkAsRead,
   conversationRequest,
   conversationSendMessage,
+  conversationTyping,
   notifyConversationOnlineStatus,
 } from "./socket/socketConversation.js";
 
@@ -25,6 +26,10 @@ export const initializeSocket = async (io) => {
 
       socket.on("conversation:send-message", (data) =>
         conversationSendMessage(io, socket, data),
+      );
+
+      socket.on("conversation:typing", (data) =>
+        conversationTyping(io, socket, data),
       );
 
       socket.on("disconnect", async () => {
