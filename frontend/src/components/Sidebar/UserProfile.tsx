@@ -4,18 +4,23 @@ import { LogOut } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { authService } from "../../services/authService";
 import { useNavigate } from "react-router";
+import { useConversationStore } from "../../store/conversationStore";
 
 const UserProfile: React.FC = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const { selectedConversation, setSelectedConversation } =
+    useConversationStore();
 
   const queryClient = useQueryClient();
 
   const logoutUser = async () => {
     await authService.logout();
     logout();
-    await queryClient.removeQueries({ queryKey: ["auth"] });
-
+    await queryClient.removeQueries();
+    if (selectedConversation) {
+      setSelectedConversation(null);
+    }
     return navigate("/auth");
   };
 
@@ -36,7 +41,7 @@ const UserProfile: React.FC = () => {
         onClick={() => logoutUser()}
         className="text-gray-500 hover:text-gray-700 cursor-pointer"
       >
-        <LogOut className="size-[16px]" />
+        <LogOut className="size-4" />
       </button>
     </div>
   );
