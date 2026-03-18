@@ -12,6 +12,7 @@ import { Server } from "socket.io";
 import { initializeSocket } from "./socket.js";
 import { socketAuthMiddleware } from "./socket/socketAuthMiddleware.js";
 import RedisService from "./services/RedisService.js";
+import messageRoutes from "./routes/messageRoutes.js";
 
 connectDB();
 
@@ -30,6 +31,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/conversations", messageRoutes);
 
 const io = new Server(httpServer, {
   cors: {

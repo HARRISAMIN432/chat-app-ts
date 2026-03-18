@@ -9,7 +9,7 @@ const ChatWindow: React.FC = () => {
   const { selectedConversation } = useConversationStore();
 
   return (
-    <div className="min-h-screen w-full bg-white flex flex-col justify-between">
+    <div className="min-h-screen max-h-screen w-full bg-white flex flex-col justify-between">
       {selectedConversation && <ChatHeader />}
       {selectedConversation && <MessageList />}
       {selectedConversation && <MessageInput />}
